@@ -175,6 +175,12 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
       this.viewerService.metaData.muted = this.player.muted();
     });
 
+    this.player.on('ended',(data) => {
+      this.viewerService.metaData.currentDuration = 0;
+      this.handleVideoControls({ type: 'ended' });
+      this.viewerService.playerEvent.emit({ type: 'ended' });
+    });
+
     this.player.on('play', (data) => {
       this.currentPlayerState = 'play';
       this.showPauseButton = true;
@@ -183,16 +189,15 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
       this.isAutoplayPrevented = false;
     });
 
-    this.player.on('timeupdate', (data) => {
+    this.player.on('timeupdate', (event) => {
       this.viewerService.metaData.currentDuration = this.player.currentTime();
-      this.handleVideoControls(data);
-      this.viewerService.playerEvent.emit(data);
-
-      if (this.player.currentTime() >= this.totalDuration) {
+      this.handleVideoControls(event);
+      this.viewerService.playerEvent.emit(event);
+      if (this.player.currentTime() >= this.player.duration()) {
         this.viewerService.metaData.currentDuration = 0;
-        this.handleVideoControls({ type: 'ended' });
-        this.viewerService.playerEvent.emit({ type: 'ended' });
-      }
+      this.handleVideoControls({ type: 'ended' });
+      this.viewerService.playerEvent.emit({ type: 'ended' });
+    }
     });
     events.forEach(event => {
       this.player.on(event, (data) => {

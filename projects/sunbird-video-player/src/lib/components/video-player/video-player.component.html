@@ -1,4 +1,4 @@
-<video webkit-playsinline playsinline autoplay muted loop #target class="video-js" controls (loadeddata)="onLoadMetadata($event)"></video>
+<video webkit-playsinline playsinline autoplay #target class="video-js" controls (loadeddata)="onLoadMetadata($event)"></video>
 
 <div #controlDiv>
   <div [ngClass]="{'player-for-back-ward-controls': currentPlayerState === 'pause' || showControls }">
