@@ -174,7 +174,7 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
       this.viewerService.metaData.volume.push(this.player.volume());
       this.viewerService.metaData.muted = this.player.muted();
     });
-
+    //Not a Reliable event for lot of browsers. Some might end up in not firing this event #SB-28548
     this.player.on('ended',(data) => {
       this.viewerService.metaData.currentDuration = 0;
       this.handleVideoControls({ type: 'ended' });
@@ -193,6 +193,7 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
       this.viewerService.metaData.currentDuration = this.player.currentTime();
       this.handleVideoControls(event);
       this.viewerService.playerEvent.emit(event);
+      //Alternative developed for end event if in case end event is not triggered #SB-28548
       if (this.player.currentTime() >= this.player.duration()) {
         this.viewerService.metaData.currentDuration = 0;
       this.handleVideoControls({ type: 'ended' });
