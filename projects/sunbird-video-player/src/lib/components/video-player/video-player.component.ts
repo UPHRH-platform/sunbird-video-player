@@ -41,7 +41,6 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
   constructor(public viewerService: ViewerService, private renderer2: Renderer2,public questionCursor: QuestionCursor,private http: HttpClient,) { }
 
   ngAfterViewInit() {
-    this.target.nativeElement.
     this.viewerService.getPlayerOptions().then(async (options) => {
       this.player = await videojs(this.target.nativeElement, {
         fluid: true,
