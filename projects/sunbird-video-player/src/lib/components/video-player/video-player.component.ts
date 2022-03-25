@@ -196,9 +196,9 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
       //Alternative developed for end event if in case end event is not triggered #SB-28548
       if (this.player.currentTime() >= this.player.duration()) {
         this.viewerService.metaData.currentDuration = 0;
-      this.handleVideoControls({ type: 'ended' });
-      this.viewerService.playerEvent.emit({ type: 'ended' });
-    }
+        this.handleVideoControls({ type: 'ended' });
+        this.viewerService.playerEvent.emit({ type: 'ended' });
+      }
     });
     events.forEach(event => {
       this.player.on(event, (data) => {
@@ -250,6 +250,10 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
   }
 
   handleVideoControls({ type }) {
+    if (!this.totalDuration) {
+      this.totalDuration = this.viewerService.metaData.totalDuration = this.player.duration();
+      console.log('Total Duration', this.totalDuration);
+    }
     if (type === 'playing') {
       this.showPlayButton = false;
       this.showPauseButton = true;
