@@ -176,6 +176,12 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
       this.viewerService.metaData.volume.push(this.player.volume());
       this.viewerService.metaData.muted = this.player.muted();
     });
+    //Not a Reliable event for lot of browsers. Some might end up in not firing this event #SB-28548
+    this.player.on('ended',(data) => {
+      this.viewerService.metaData.currentDuration = 0;
+      this.handleVideoControls({ type: 'ended' });
+      this.viewerService.playerEvent.emit({ type: 'ended' });
+    });
 
     this.player.on('play', (data) => {
       this.currentPlayerState = 'play';
@@ -185,12 +191,12 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
       this.isAutoplayPrevented = false;
     });
 
-    this.player.on('timeupdate', (data) => {
+    this.player.on('timeupdate', (event) => {
       this.viewerService.metaData.currentDuration = this.player.currentTime();
-      this.handleVideoControls(data);
-      this.viewerService.playerEvent.emit(data);
-
-      if (this.player.currentTime() >= this.totalDuration) {
+      this.handleVideoControls(event);
+      this.viewerService.playerEvent.emit(event);
+      //Alternative developed for end event if in case end event is not triggered #SB-28548
+      if (this.player.currentTime() >= this.player.duration()) {
         this.viewerService.metaData.currentDuration = 0;
         this.handleVideoControls({ type: 'ended' });
         this.viewerService.playerEvent.emit({ type: 'ended' });
@@ -254,6 +260,10 @@ export class VideoPlayerComponent implements AfterViewInit, OnDestroy {
   }
 
   handleVideoControls({ type }) {
+    if (!this.totalDuration) {
+      this.totalDuration = this.viewerService.metaData.totalDuration = this.player.duration();
+      console.log('Total Duration', this.totalDuration);
+    }
     if (type === 'playing') {
       this.showPlayButton = false;
       this.showPauseButton = true;
